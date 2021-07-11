@@ -60,7 +60,7 @@ const Todos = ({todos, isLoading}) =>{
                         <div>{todo.description}</div>
                         <div>Created At: {new Date(todo.createdAt).toDateString()}</div>
                         <div>Status {todo.completed.toString()}</div>
-
+                        <div></div>
                         <hr/>
                     </Fragment>
 
