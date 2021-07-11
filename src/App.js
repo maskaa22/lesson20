@@ -11,6 +11,7 @@ import {setLoadingFalse, setLoadingTrue, AddTodos, PushTodo} from "./redux/actio
 const CreateTodoForm = ({onSubmit}) =>{
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+
     const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -45,7 +46,7 @@ const CreateTodoForm = ({onSubmit}) =>{
         </form>
     )
 }
-const Todos = ({todos, isLoading}) =>{
+const Todos = ({todos, isLoading, onTodoDelete}) =>{
     if(isLoading) return <h1>LOADING...</h1>
 
     return (
@@ -60,7 +61,9 @@ const Todos = ({todos, isLoading}) =>{
                         <div>{todo.description}</div>
                         <div>Created At: {new Date(todo.createdAt).toDateString()}</div>
                         <div>Status {todo.completed.toString()}</div>
-                        <div><button></button></div>
+                        <div><button onClick={()=>{
+                            onTodoDelete(todo.id);
+                        }}>delete</button></div>
                         <hr/>
                     </Fragment>
 
@@ -107,10 +110,28 @@ function App()
         dispatch(PushTodo(data))
         //fetchTodos();
     }
+
+    const onTodoDelete = async (id)=>{
+console.log(id);
+        const resp = await fetch('http://localhost:8888/delete-todo', {
+            method: 'DELETE',
+            body: JSON.stringify({id}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        const data = await resp.json();
+
+        dispatch({
+            type:'DELETE_TODO',
+            payload:data
+        })
+
+    }
   return (
     <div>
-        <CreateTodoForm onSubmit={onTodoCreate}/>
-          <Todos todos={todos} isLoading={todosLoading}/>
+        <CreateTodoForm onSubmit={onTodoCreate} />
+          <Todos todos={todos} isLoading={todosLoading} onTodoDelete={onTodoDelete}/>
 
     </div>
   );
