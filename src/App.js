@@ -3,7 +3,7 @@ import './App.css';
 import {useEffect, useState} from "react";
 import {Fragment} from "react";
 import {todosReducer} from './redux/reducers';
-import {setLoadingFalse, setLoadingTrue, AddTodos, PushTodo} from "./redux/actionCreators";
+import {setLoadingFalse, setLoadingTrue, AddTodos, PushTodo, DeleteTodo, CompliteTodo} from "./redux/actionCreators";
 
 
 
@@ -46,7 +46,7 @@ const CreateTodoForm = ({onSubmit}) =>{
         </form>
     )
 }
-const Todos = ({todos, isLoading, onTodoDelete}) =>{
+const Todos = ({todos, isLoading, onTodoDelete, onTodoComplete}) =>{
     if(isLoading) return <h1>LOADING...</h1>
 
     return (
@@ -61,9 +61,15 @@ const Todos = ({todos, isLoading, onTodoDelete}) =>{
                         <div>{todo.description}</div>
                         <div>Created At: {new Date(todo.createdAt).toDateString()}</div>
                         <div>Status {todo.completed.toString()}</div>
-                        <div><button onClick={()=>{
+                        <div>
+                            <button onClick={()=>{
                             onTodoDelete(todo.id);
-                        }}>delete</button></div>
+                        }}>delete</button>
+                            <button onClick={()=>{
+
+                                onTodoComplete(todo.id, todo.completed)
+                            }}>complete</button>
+                        </div>
                         <hr/>
                     </Fragment>
 
@@ -112,26 +118,31 @@ function App()
     }
 
     const onTodoDelete = async (id)=>{
-console.log(id);
-        const resp = await fetch('http://localhost:8888/delete-todo', {
+        const resp = await fetch('http://localhost:8888/delete-todo/'+id, {
             method: 'DELETE',
-            body: JSON.stringify({id}),
+        })
+        await resp.json();
+        dispatch(DeleteTodo(id))
+
+    }
+    const onTodoComplete = async (id, completed)=>{
+console.log(completed);
+        const resp = await fetch('http://localhost:8888/update-todo/' +id, {
+            method: 'PATCH',
+            body: JSON.stringify({completed:true}),
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-        const data = await resp.json();
-
-        dispatch({
-            type:'DELETE_TODO',
-            payload:data
-        })
-
+         const data = await resp.json();
+        console.log(data);
+        dispatch(CompliteTodo(data))
+        fetchTodos();
     }
   return (
     <div>
         <CreateTodoForm onSubmit={onTodoCreate} />
-          <Todos todos={todos} isLoading={todosLoading} onTodoDelete={onTodoDelete}/>
+          <Todos todos={todos} isLoading={todosLoading} onTodoDelete={onTodoDelete} onTodoComplete={onTodoComplete}/>
 
     </div>
   );
