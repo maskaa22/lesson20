@@ -46,7 +46,7 @@ const CreateTodoForm = ({onSubmit}) =>{
         </form>
     )
 }
-const Todos = ({todos, isLoading, onTodoDelete, onTodoComplete}) =>{
+const Todos = ({todos, isLoading, onTodoDelete, onTodoComplete, onComplete}) =>{
     if(isLoading) return <h1>LOADING...</h1>
 
     return (
@@ -56,6 +56,7 @@ const Todos = ({todos, isLoading, onTodoDelete, onTodoComplete}) =>{
                 {
 
                     return (
+
                     <Fragment key={todo.id}>
                         <div>{todo.title}</div>
                         <div>{todo.description}</div>
@@ -66,8 +67,8 @@ const Todos = ({todos, isLoading, onTodoDelete, onTodoComplete}) =>{
                             onTodoDelete(todo.id);
                         }}>delete</button>
                             <button onClick={()=>{
+                                onTodoComplete(todo.id, todo.completed);
 
-                                onTodoComplete(todo.id, todo.completed)
                             }}>complete</button>
                         </div>
                         <hr/>
@@ -78,6 +79,7 @@ const Todos = ({todos, isLoading, onTodoDelete, onTodoComplete}) =>{
         </div>
     )
 }
+//{color:todo.completed==='true'?'red':'grey'}
 
 function App()
 {
@@ -125,24 +127,50 @@ function App()
         dispatch(DeleteTodo(id))
 
     }
+
     const onTodoComplete = async (id, completed)=>{
-console.log(completed);
+
         const resp = await fetch('http://localhost:8888/update-todo/' +id, {
             method: 'PATCH',
-            body: JSON.stringify({completed:true}),
+            body: JSON.stringify({completed:!completed}),
+            headers: {
+                'Acept':'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+
+         const data = await resp.json();
+        console.log(data);
+        dispatch(CompliteTodo(data, id));
+
+        fetchTodos();
+    }
+    const onComplete = async (id, completed, )=>{
+        console.log(completed);
+        const resp = await fetch('http://localhost:8888/update-todo/' +id, {
+            method: 'PATCH',
+            body: JSON.stringify({completed}),
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-         const data = await resp.json();
+        const cl ={
+            color:'red'
+        }
+        const data = await resp.json();
         console.log(data);
-        dispatch(CompliteTodo(data))
-        fetchTodos();
+        dispatch({
+            type: 'A_TODO',
+            payload: data,
+            color:cl
+        });
+
+        //fetchTodos();
     }
   return (
     <div>
         <CreateTodoForm onSubmit={onTodoCreate} />
-          <Todos todos={todos} isLoading={todosLoading} onTodoDelete={onTodoDelete} onTodoComplete={onTodoComplete}/>
+          <Todos todos={todos} isLoading={todosLoading} onTodoDelete={onTodoDelete} onTodoComplete={onTodoComplete} onComplete={onComplete}/>
 
     </div>
   );

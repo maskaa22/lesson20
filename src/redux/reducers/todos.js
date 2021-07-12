@@ -8,7 +8,8 @@ import {
 } from '../actionTypes'
 const initialState = {
     todos:[],
-    todosLoading: false
+    todosLoading: false,
+    color: []
 }
 
 export const todosReducer = (state=initialState, action) => {
@@ -29,8 +30,19 @@ export const todosReducer = (state=initialState, action) => {
             return {...state, todos:[...state.todos.filter(val=> val.id !==action.payload)]}
         }
         case COMPLETE_STATUS: {
-            return {...state, todos:[...state.todos.map(todo => todo.id === action.id ?
-                    { ...todo, completed: action.completed } : todo)]}
+            return {
+                ...state, todos: [...state.todos.map(todo =>
+                    todo.id === action.id ?
+                        {...todo, completed: action.completed} : todo)]
+            }
+
+        }
+        case 'A_TODO': {
+            return {
+                // ...state, todos: [...state.todos.map(todo =>
+                //     todo.id === action.id ?
+                //         {...todo, color:todo.completed==='true'?'red':'grey'} : todo)]
+            }
         }
         default: return state
     }
