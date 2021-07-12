@@ -138,7 +138,6 @@ function App()
                 'Content-Type': 'application/json'
             }
         })
-
          const data = await resp.json();
         console.log(data);
         dispatch(CompliteTodo(data, id));
