@@ -141,7 +141,6 @@ function App()
          const data = await resp.json();
         console.log(data);
         dispatch(CompliteTodo(data, id));
-
         fetchTodos();
     }
     const onComplete = async (id, completed, )=>{
@@ -163,7 +162,6 @@ function App()
             payload: data,
             color:cl
         });
-
         //fetchTodos();
     }
   return (
